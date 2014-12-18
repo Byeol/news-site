@@ -31,11 +31,18 @@ public class JdbcArticleRepository implements ArticleRepository {
     private static final String columnTitle = "title";
     private static final String columnContent = "content";
     private static final String columnCreatedDate = "created_date";
+    private static final String joinColumnUserNickname = "user_nickname";
+
+    private static final String userTableName = "user";
+
+    private static final String userColumnId = "id";
+    private static final String userColumnNickname = "nickname";
 
     public Article findArticle(Integer articleId) {
         Article article;
-        String sql = "SELECT * FROM " + tableName
-                + " WHERE " + columnId + " = :id";
+        String sql = "SELECT " + tableName + "." + "*" + ", " + userTableName + "." + userColumnNickname + " AS " + joinColumnUserNickname + " FROM " + tableName
+                + " JOIN " + userTableName + " ON " + tableName + "." + columnUserId + " = " + userTableName + "." + userColumnId
+                + " WHERE " + tableName + "." + columnId + " = " + ":id";
         SqlParameterSource namedParameters = new MapSqlParameterSource("id", articleId);
 
         try {
@@ -48,7 +55,8 @@ public class JdbcArticleRepository implements ArticleRepository {
     }
 
     public List<Article> findAllArticles() {
-        String sql = "SELECT * FROM " + tableName;
+        String sql = "SELECT " + tableName + "." + "*" + ", " + userTableName + "." + userColumnNickname + " AS " + joinColumnUserNickname + " FROM " + tableName
+                + " JOIN " + userTableName + " ON " + tableName + "." + columnUserId + " = " + userTableName + "." + userColumnId;
 
         return this.namedParameterJdbcTemplate.query(sql, new ArticleMapper());
     }
@@ -69,8 +77,8 @@ public class JdbcArticleRepository implements ArticleRepository {
 
     public void updateArticle(Article article) {
         String sql = "UPDATE " + tableName
-                + " SET " + columnTitle + " = :title, " + columnContent + " = :content"
-                + " WHERE " + columnId + " = :id";
+                + " SET " + columnTitle + " = " + ":title" + ", " + columnContent + " = " + ":content"
+                + " WHERE " + columnId + " = " + ":id";
         SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(article);
 
         this.namedParameterJdbcTemplate.update(sql, namedParameters);
@@ -78,7 +86,7 @@ public class JdbcArticleRepository implements ArticleRepository {
 
     public void deleteArticle(Integer articleId) {
         String sql = "DELETE FROM " + tableName
-                + " WHERE " + columnId + " = :id";
+                + " WHERE " + columnId + " = " + ":id";
         SqlParameterSource namedParameters = new MapSqlParameterSource("id", articleId);
 
         this.namedParameterJdbcTemplate.update(sql, namedParameters);
@@ -89,11 +97,12 @@ public class JdbcArticleRepository implements ArticleRepository {
         public Article mapRow(ResultSet rs, int rowNum) throws SQLException {
             Integer id = rs.getInt(columnId);
             Integer userId = rs.getInt(columnUserId);
+            String userNickname = rs.getString(joinColumnUserNickname);
             String title = rs.getString(columnTitle);
             String content = rs.getString(columnContent);
             Date createdDate = rs.getDate(columnCreatedDate);
 
-            return new Article(id, userId, title, content, createdDate);
+            return new Article(id, userId, userNickname, title, content, createdDate);
         }
     }
 

@@ -31,11 +31,18 @@ public class JdbcCommentRepository implements CommentRepository {
     private static final String columnUserId = "user_id";
     private static final String columnContent = "content";
     private static final String columnCreatedDate = "created_date";
+    private static final String joinColumnUserNickname = "user_nickname";
+
+    private static final String userTableName = "user";
+
+    private static final String userColumnId = "id";
+    private static final String userColumnNickname = "nickname";
 
     public Comment findComment(Integer commentId) {
         Comment comment;
-        String sql = "SELECT * FROM " + tableName
-                + " WHERE " + columnId + " = :id";
+        String sql = "SELECT " + tableName + "." + "*" + ", " + userTableName + "." + userColumnNickname + " AS " + joinColumnUserNickname + " FROM " + tableName
+                + " JOIN " + userTableName + " ON " + tableName + "." + columnUserId + " = " + userTableName + "." + userColumnId
+                + " WHERE " + tableName + "." + columnId + " = " + ":id";
         SqlParameterSource namedParameters = new MapSqlParameterSource("id", commentId);
 
         try {
@@ -48,8 +55,9 @@ public class JdbcCommentRepository implements CommentRepository {
     }
 
     public List<Comment> findAllCommentsByArticle(Integer articleId) {
-        String sql = "SELECT * FROM " + tableName
-                + " WHERE " + columnArticleId + " = :articleId";
+        String sql = "SELECT " + tableName + "." + "*" + ", " + userTableName + "." + userColumnNickname + " AS " + joinColumnUserNickname + " FROM " + tableName
+                + " JOIN " + userTableName + " ON " + tableName + "." + columnUserId + " = " + userTableName + "." + userColumnId
+                + " WHERE " + columnArticleId + " = " + ":articleId";
         SqlParameterSource namedParameters = new MapSqlParameterSource("articleId", articleId);
 
         return this.namedParameterJdbcTemplate.query(sql, namedParameters, new CommentMapper());
@@ -71,8 +79,8 @@ public class JdbcCommentRepository implements CommentRepository {
 
     public void updateComment(Comment comment) {
         String sql = "UPDATE " + tableName
-                + " SET " + columnContent + " = :content"
-                + " WHERE " + columnId + " = :id";
+                + " SET " + columnContent + " = " + ":content"
+                + " WHERE " + columnId + " = " + ":id";
         SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(comment);
 
         this.namedParameterJdbcTemplate.update(sql, namedParameters);
@@ -80,7 +88,7 @@ public class JdbcCommentRepository implements CommentRepository {
 
     public void deleteComment(Integer commentId) {
         String sql = "DELETE FROM " + tableName
-                + " WHERE " + columnId + " = :id";
+                + " WHERE " + columnId + " = " + ":id";
         SqlParameterSource namedParameters = new MapSqlParameterSource("id", commentId);
 
         this.namedParameterJdbcTemplate.update(sql, namedParameters);
@@ -88,7 +96,7 @@ public class JdbcCommentRepository implements CommentRepository {
 
     public void deleteAllCommentsByArticle(Integer articleId) {
         String sql = "DELETE FROM " + tableName
-                + " WHERE " + columnArticleId + " = :articleId";
+                + " WHERE " + columnArticleId + " = " + ":articleId";
         SqlParameterSource namedParameters = new MapSqlParameterSource("articleId", articleId);
 
         this.namedParameterJdbcTemplate.update(sql, namedParameters);
@@ -100,10 +108,11 @@ public class JdbcCommentRepository implements CommentRepository {
             Integer id = rs.getInt(columnId);
             Integer articleId = rs.getInt(columnArticleId);
             Integer userId = rs.getInt(columnUserId);
+            String userNickname = rs.getString(joinColumnUserNickname);
             String content = rs.getString(columnContent);
             Date createdDate = rs.getDate(columnCreatedDate);
 
-            return new Comment(id, articleId, userId, content, createdDate);
+            return new Comment(id, articleId, userId, userNickname, content, createdDate);
         }
     }
 }

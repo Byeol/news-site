@@ -6,6 +6,7 @@ public class Comment {
     private final Integer id;
     private final Integer articleId;
     private final Integer userId;
+    private String userNickname;
     private String content;
     private final Date createdDate;
 
@@ -24,10 +25,11 @@ public class Comment {
         this.createdDate = new Date();
     }
 
-    public Comment(Integer id, Integer articleId, Integer userId, String content, Date createdDate) {
+    public Comment(Integer id, Integer articleId, Integer userId, String userNickname, String content, Date createdDate) {
         this.id = id;
         this.articleId = articleId;
         this.userId = userId;
+        this.userNickname = userNickname;
         this.content = content;
         this.createdDate = createdDate;
     }
@@ -42,6 +44,14 @@ public class Comment {
 
     public Integer getUserId() {
         return userId;
+    }
+
+    public String getUserNickname() {
+        return userNickname;
+    }
+
+    public void setUserNickname(String userNickname) {
+        this.userNickname = userNickname;
     }
 
     public String getContent() {

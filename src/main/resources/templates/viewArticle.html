@@ -7,7 +7,7 @@
 <div class="container">
     <div class="page-header">
         <h1><span th:text="${article.title}" />
-            <small th:text="${article.createdDate}" /></h1>
+            <small th:text="${article.userNickname}" /></h1>
     </div>
 
     <p th:utext="${#strings.replace(article.content,T(java.lang.System).getProperty('line.separator'),'&lt;br /&gt;')}" ></p>
@@ -22,7 +22,7 @@
         <li th:each="comment : ${comments}" class="media">
             <div class="media-body">
                 <h4 class="media-heading">
-                    <span th:text="${comment.createdDate}" />
+                    <span th:text="${comment.userNickname}" /> <small th:text="${comment.createdDate}" />
                     <a th:href="@{/comments/{commentId}/edit(commentId=${comment.id})}" th:text="#{viewArticle.editComment}" class="btn btn-primary btn-lg" role="button" style="position: absolute; right: 100px;" />
                 </h4>
                 <span th:text="${comment.content}" />
