@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/common :: header" />
+<body>
+<nav th:replace="fragments/common :: navbar" />
+
+<div class="container">
+    <div class="page-header">
+        <h1 th:text="#{postArticle.heading}" />
+    </div>
+
+    <p>
+        <label th:text="#{article.title}" for="articleTitle" />
+        <input type="text" class="form-control" id="articleTitle" placeholder="제목을 입력하세요." />
+    </p>
+
+    <p>
+        <label th:text="#{article.content}" for="articleContent" />
+        <textarea class="form-control" id="articleContent" placeholder="내용을 입력하세요." rows="8" />
+    </p>
+
+    <p>
+        <a th:text="#{postArticle.submit}" href="#" class="btn btn-primary btn-lg submit-article" role="button" />
+    </p>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script th:replace="fragments/libs :: jquery" />
+<script th:replace="fragments/libs :: bootstrap_js" />
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    function submitArticle() {
+        var articlesUrl = [[@{/}]] + "articles";
+
+        var article = {
+            title: $( '#articleTitle' ).val(),
+            content: $( '#articleContent' ).val()
+        };
+
+        $.ajax({
+            type: "POST",
+            url: articlesUrl,
+            data: JSON.stringify( article ),
+            contentType: "application/json; charset=utf-8",
+            success: function(xml, status, xhr) {
+                var articleUrl = xhr.getResponseHeader( "Location" );
+                window.location.replace( articleUrl + "/view" );
+            }
+        });
+    }
+    $( document ).ready( function() {
+        $( '.submit-article' ).click( submitArticle );
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

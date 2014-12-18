@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/common :: header" />
+<body>
+<nav th:replace="fragments/common :: navbar" />
+
+<div class="jumbotron">
+    <div class="container">
+        <h1 th:text="#{main.welcomeMessage}" />
+        <p th:text="#{main.welcomeDescription}" />
+        <p>
+            <a th:href="@{/articles/list}" th:text="#{main.listArticle}" class="btn btn-primary btn-lg" role="button" />
+            <a th:href="@{/articles/post}" th:text="#{main.postArticle}" class="btn btn-primary btn-lg" role="button" />
+        </p>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script th:replace="fragments/libs :: jquery" />
+<script th:replace="fragments/libs :: bootstrap_js" />
+</body>
+</html>

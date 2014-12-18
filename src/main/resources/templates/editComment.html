@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/common :: header" />
+<body>
+<nav th:replace="fragments/common :: navbar" />
+
+<div class="container">
+    <div class="page-header">
+        <h1 th:text="#{editComment.heading}" />
+    </div>
+
+    <p>
+        <label th:text="#{comment.content}" for="commentContent" />
+        <textarea th:text="${comment.content}" class="form-control" id="commentContent" placeholder="내용을 입력하세요." rows="8" />
+    </p>
+
+    <p>
+        <a th:text="#{editComment.submit}" href="#" class="btn btn-primary btn-lg submit-comment" role="button" />
+        <button th:text="#{editComment.deleteComment}" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#deleteModal" />
+    </p>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 th:text="#{editComment.deleteHeading}" class="modal-title" id="deleteModalLabel" />
+            </div>
+            <div th:text="#{editComment.deleteMessage}" class="modal-body" />
+            <div class="modal-footer">
+                <button th:text="#{button.cancel}" type="button" class="btn btn-default" data-dismiss="modal" />
+                <button th:text="#{button.delete}" type="button" class="btn btn-danger delete-comment" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script th:replace="fragments/libs :: jquery" />
+<script th:replace="fragments/libs :: bootstrap_js" />
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    function submitComment() {
+        var comment = {
+            content: $( '#commentContent' ).val()
+        };
+
+        var articlesUrl = [[@{/}]] + "articles";
+        var articleUrl = articlesUrl + "/" + [[${comment.articleId}]];
+
+        var commentsUrl = [[@{/}]] + "comments";
+        var commentUrl = commentsUrl + "/" + [[${comment.id}]];
+
+        $.ajax({
+            type: "PATCH",
+            url: commentUrl,
+            data: JSON.stringify( comment ),
+            contentType: "application/json; charset=utf-8",
+            success: function() {
+                window.location.replace( articleUrl + "/view" );
+            }
+        });
+    }
+
+    function deleteComment() {
+        var articlesUrl = [[@{/}]] + "articles";
+        var articleUrl = articlesUrl + "/" + [[${comment.articleId}]];
+
+        var commentsUrl = [[@{/}]] + "comments";
+        var commentUrl = commentsUrl + "/" + [[${comment.id}]];
+
+        $.ajax({
+            type: "DELETE",
+            url: commentUrl,
+            success: function() {
+                window.location.replace( articleUrl + "/view" );
+            }
+        });
+    }
+
+    $( document ).ready( function() {
+        $( '.submit-comment' ).click( submitComment );
+        $( '.delete-comment' ).click( deleteComment );
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/common :: header" />
+<body>
+<nav th:replace="fragments/common :: navbar" />
+
+<div class="container">
+    <div class="page-header">
+        <h1 th:text="#{editArticle.heading}" />
+    </div>
+
+    <p>
+        <label th:text="#{article.title}" for="articleTitle" />
+        <input th:value="${article.title}" type="text" class="form-control" id="articleTitle" placeholder="제목을 입력하세요." />
+    </p>
+
+    <p>
+        <label th:text="#{article.content}" for="articleContent" />
+        <textarea th:text="${article.content}" class="form-control" id="articleContent" placeholder="내용을 입력하세요." rows="8" />
+    </p>
+
+    <p>
+        <a th:text="#{editArticle.submit}" href="#" class="btn btn-primary btn-lg submit-article" role="button" />
+        <button th:text="#{editArticle.deleteArticle}" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#deleteModal" />
+    </p>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 th:text="#{editArticle.deleteHeading}" class="modal-title" id="deleteModalLabel" />
+            </div>
+            <div th:text="#{editArticle.deleteMessage}" class="modal-body" />
+            <div class="modal-footer">
+                <button th:text="#{button.cancel}" type="button" class="btn btn-default" data-dismiss="modal" />
+                <button th:text="#{button.delete}" type="button" class="btn btn-danger delete-article" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script th:replace="fragments/libs :: jquery" />
+<script th:replace="fragments/libs :: bootstrap_js" />
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    function submitArticle() {
+        var article = {
+            title: $( '#articleTitle' ).val(),
+            content: $( '#articleContent' ).val()
+        };
+
+        var articlesUrl = [[@{/}]] + "articles";
+        var articleUrl = articlesUrl + "/" + [[${article.id}]];
+
+        $.ajax({
+            type: "PATCH",
+            url: articleUrl,
+            data: JSON.stringify( article ),
+            contentType: "application/json; charset=utf-8",
+            success: function(xml, status, xhr) {
+                window.location.replace( articleUrl + "/view" );
+            }
+        });
+    }
+
+    function deleteArticle() {
+        var articlesUrl = [[@{/}]] + "articles";
+        var articleUrl = articlesUrl + "/" + [[${article.id}]];
+
+        $.ajax({
+            type: "DELETE",
+            url: articleUrl,
+            success: function() {
+                window.location.replace( articlesUrl + "/list" );
+            }
+        });
+    }
+
+    $( document ).ready( function() {
+        $( '.submit-article' ).click( submitArticle );
+        $( '.delete-article' ).click( deleteArticle );
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

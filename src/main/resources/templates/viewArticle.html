@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/common :: header" />
+<body>
+<nav th:replace="fragments/common :: navbar" />
+
+<div class="container">
+    <div class="page-header">
+        <h1><span th:text="${article.title}" />
+            <small th:text="${article.createdDate}" /></h1>
+    </div>
+
+    <p th:utext="${#strings.replace(article.content,T(java.lang.System).getProperty('line.separator'),'&lt;br /&gt;')}" ></p>
+    <p>
+        <a href="edit" th:text="#{viewArticle.editArticle}" class="btn btn-primary btn-lg" role="button" />
+        <button th:text="#{viewArticle.createComment}" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#commentModal" />
+    </p>
+
+    <hr />
+
+    <ul class="media-list comment-list">
+        <li th:each="comment : ${comments}" class="media">
+            <div class="media-body">
+                <h4 class="media-heading">
+                    <span th:text="${comment.createdDate}" />
+                    <a th:href="@{/comments/{commentId}/edit(commentId=${comment.id})}" th:text="#{viewArticle.editComment}" class="btn btn-primary btn-lg" role="button" style="position: absolute; right: 100px;" />
+                </h4>
+                <span th:text="${comment.content}" />
+            </div>
+            <hr />
+        </li>
+    </ul>
+</div>
+
+<!-- Comment Modal -->
+<div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 th:text="#{viewArticle.commentHeading}" class="modal-title" id="commentModalLabel" />
+            </div>
+            <div class="modal-body">
+                <span th:text="#{viewArticle.commentMessage}" />
+                <p>
+                    <label th:text="#{viewArticle.commentContent}" for="commentContent" />
+                    <textarea class="form-control" id="commentContent" placeholder="댓글 내용을 입력하세요." rows="4" />
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button th:text="#{button.cancel}" type="button" class="btn btn-default" data-dismiss="modal" />
+                <button th:text="#{button.comment}" type="button" class="btn btn-primary submit-comment" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script th:replace="fragments/libs :: jquery" />
+<script th:replace="fragments/libs :: bootstrap_js" />
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    function submitComment() {
+        var articlesUrl = [[@{/}]] + "articles";
+        var articleUrl = articlesUrl + "/" + [[${article.id}]];
+
+        var comment = {
+            content: $( '#commentContent' ).val()
+        };
+
+        $.ajax({
+            type: "POST",
+            url: articleUrl + "/comments" ,
+            data: JSON.stringify( comment ),
+            contentType: "application/json; charset=utf-8",
+            success: function() {
+                location.reload();
+            }
+        });
+    }
+
+    $( document ).ready( function() {
+        $( '.submit-comment' ).click( submitComment );
+    });
+    /*]]>*/
+</script>
+</body>
+</html>
