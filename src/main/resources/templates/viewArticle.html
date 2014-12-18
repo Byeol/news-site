@@ -12,10 +12,11 @@
 
     <p th:utext="${#strings.replace(article.content,T(java.lang.System).getProperty('line.separator'),'&lt;br /&gt;')}" ></p>
     <p>
-        <a href="edit" th:text="#{viewArticle.editArticle}" class="btn btn-primary btn-lg" role="button" />
-        <button th:text="#{viewArticle.createComment}" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#commentModal" />
+        <a href="edit" th:text="#{viewArticle.editArticle}" class="btn btn-primary btn-lg" role="button" style="position: absolute; right: 100px;" />
+        <button th:text="#{viewArticle.createComment}" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#commentModal" style="position: absolute; right: 220px;" />
     </p>
 
+    <h3 th:text="#{viewArticle.comment}" />
     <hr />
 
     <ul class="media-list comment-list">
